@@ -1,0 +1,16 @@
+# Local datasets stay outside this code-only publication.
+/regional_crypto_15m/
+/data/
+/datasets/
+__pycache__/
+*.py[cod]
+.DS_Store
+*.csv
+*.npz
+*.npy
+*.parquet
+*.arrow
+*.feather
+*.log
+.env
+.env.*

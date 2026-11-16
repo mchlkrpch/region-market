@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f7f7"><title>Crypto Workspace</title><link rel="stylesheet" href="styles.css"><script src="grid.js" defer></script><script src="plot.js" defer></script><script src="date_input.js" defer></script><script src="study.js" defer></script><script src="news.js" defer></script><script src="app.js" defer></script></head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+ <div class="sidebar-tabs" role="tablist" aria-label="Данные графика">
+  <button id="tab-regions" role="tab" aria-selected="true" aria-controls="regions-section" tabindex="0">Регионы</button>
+  <button id="tab-news" role="tab" aria-selected="false" aria-controls="news-section" tabindex="-1">Новости</button>
+  <button id="tab-coins" role="tab" aria-selected="false" aria-controls="coins-section" tabindex="-1">Монеты</button>
+ </div>
+ <div class="sections">
+ <section class="sidebar-section" id="coins-section" role="tabpanel" aria-labelledby="tab-coins" hidden><div class="panel-count">Выбрано <span id="selected-count"></span></div>
+ <input id="search" type="search" placeholder="Найти монету или группу" aria-label="Поиск монеты или группы">
+ <details id="coins-tree" class="tree-root"><summary><input id="all-coins" type="checkbox" aria-label="Все доступные монеты"><span>Все</span></summary><div id="groups" class="groups"></div></details></section>
+ <section class="sidebar-section" id="news-section" role="tabpanel" aria-labelledby="tab-news" hidden><span id="news-count" hidden></span>
+ <input id="news-search" type="search" placeholder="Поиск новости" aria-label="Поиск новости">
+ <details id="news-tree" class="tree-root"><summary><input id="news-all" type="checkbox" aria-label="Все новости периода"><span>Все</span></summary><div id="news-groups"></div></details>
+ </section>
+ <section class="sidebar-section markets" id="regions-section" role="tabpanel" aria-labelledby="tab-regions"><details id="regions-tree" class="tree-root"><summary><input id="all-regions" type="checkbox" aria-label="Все регионы"><span>Все</span></summary><div id="regions"></div></details></section>
+ </div>
+ <div id="catalog-status" class="dataset">Загрузка каталога…</div>
+ <div class="side-note">Выбор для ячейки <span id="active-name">активного графика</span></div>
+ <details class="help"><summary>Управление графиком</summary><p>Два пальца — сдвиг графика под курсором. С ⌘ — прокрутка всей сетки строк и столбцов. Pinch — масштаб. Даты вводятся с клавиатуры: ГГГГ-ММ-ДД ЧЧ:ММ (UTC).</p><p>⌘ + клик — выделение. Потяните границу выбранного графика, чтобы занять соседние свободные клетки. Пустая ячейка заполняется кнопкой ＋. Номера строк и буквы столбцов выделяются кликом, ⌘ и Shift. Потяните край заголовка для изменения размера всех выделенных строк или столбцов.</p><p>Полные свечи с торгами, шаг от 15 минут. Процентная база сохраняется при перемещении.</p></details>
+</aside>
+<main>
+ <div id="global-error" role="alert" hidden></div>
+ <div class="grid-workspace"><div class="sheet-corner" aria-hidden="true"></div><div id="column-heads" aria-label="Столбцы"></div><div id="row-heads" aria-label="Строки"></div><div id="charts"></div><button id="add-column" class="add-strip vertical" aria-label="Добавить колонку графиков">＋ Добавить график</button><button id="add-row" class="add-strip horizontal" aria-label="Добавить строку графиков">＋ Добавить график</button></div>
+ <div class="scroll-reserve" aria-hidden="true"></div>
+</main>
+</div><div id="tooltip" hidden></div>
+<div id="grid-menu" role="menu" aria-label="Операции с сеткой" hidden></div>
+<template id="study-settings-template"><div class="study-settings">
+ <div class="news-window study-points"><fieldset class="floating-field"><legend>t1, мин</legend><input id="study-t1" aria-label="t1, минут относительно события" type="number" step="15" min="-10080" max="10080" value="-15"></fieldset><fieldset class="floating-field"><legend>t2, мин</legend><input id="study-t2" aria-label="t2, минут относительно события" type="number" step="15" min="-10080" max="10080" value="0"></fieldset><fieldset class="floating-field"><legend>t3, мин</legend><input id="study-t3" aria-label="t3, минут относительно события" type="number" step="15" min="-10080" max="10080" value="15"></fieldset></div>
+ <div class="study-window-caption">До: [t1, t2) · После: [t2, t3) относительно события</div>
+ <div id="news-window-error" role="alert" hidden></div>
+ <div class="study-controls">
+ <label>Выбор событий<select id="study-mode"><option value="selected">Отмеченные новости</option><option value="binary">Бинарные исходы: Да / Нет</option><option value="chains">Этапы связанных цепочек</option></select></label>
+ <label id="study-feature-row" hidden>Признак · Да / Нет / Неизвестно<select id="study-feature"></select></label>
+ <label id="study-chain-row" hidden>Тип цепочки<select id="study-chain"></select></label>
+ <label>Точность времени<select id="study-precision"><option value="exact">Внутри дня · известное время</option><option value="day">По датам · условно 00:00 UTC</option></select></label>
+ <div class="study-period" aria-label="Период событий UTC"><div>От <input id="study-input-start" class="utc-date" type="text" inputmode="numeric" aria-label="Начало периода событий UTC"></div><div>До <input id="study-input-end" class="utc-date" type="text" inputmode="numeric" aria-label="Конец периода событий UTC исключительно"> UTC</div></div>
+ <label>Группировка монет<select id="study-group-coins"><option value="all">Все выбранные вместе</option><option value="group">По группам монет</option></select></label>
+ <label>Группировка новостей<select id="study-group-news"><option value="all">Все выбранные вместе</option><option value="family">По типам новостей / цепочек</option></select></label>
+ <label class="study-check" id="study-weak-row" hidden><input type="checkbox" id="study-weak">Добавить 8 слабых связей размещений</label>
+ <div id="study-presets" class="study-presets"></div><p id="study-status" class="study-muted"></p>
+ </div>
+</div></template>
+</body></html>
