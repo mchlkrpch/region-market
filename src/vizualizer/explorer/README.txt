@@ -1,7 +1,7 @@
 Crypto Workspace
 
 Локальный просмотр 116 монет, 498 пар, семи рынков за период
-01.07.2025–01.07.2026 UTC. Запуск из каталога diploma
+01.07.2025–01.07.2026 UTC. Запуск из каталога src
 
 python3 vizualizer/explorer/server.py
 
